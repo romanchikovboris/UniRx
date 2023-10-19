@@ -16,6 +16,7 @@ namespace UniRx
     public sealed class CancellationDisposable : ICancelable
     {
         private readonly CancellationTokenSource _cts;
+        private readonly bool _isCtsInternal;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:System.Reactive.Disposables.CancellationDisposable"/> class that uses an existing <seealso cref="T:System.Threading.CancellationTokenSource"/>.
@@ -36,6 +37,7 @@ namespace UniRx
         public CancellationDisposable()
             : this(new CancellationTokenSource())
         {
+            _isCtsInternal = true;
         }
 
         /// <summary>
@@ -51,7 +53,15 @@ namespace UniRx
         /// </summary>
         public void Dispose()
         {
-            _cts.Cancel();
+            if (!IsDisposed)
+            {
+                _cts.Cancel();
+            }
+
+            if (_isCtsInternal)
+            {
+                _cts.Dispose();
+            }
         }
 
         /// <summary>
